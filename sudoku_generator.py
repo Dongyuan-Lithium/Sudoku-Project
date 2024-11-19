@@ -1,4 +1,4 @@
-import math,random
+import math,random,copy
 
 """
 This was adapted from a GeeksforGeeks article "Program for Sudoku Generator" by Aarti_Rathi and Ankur Trisal
@@ -23,8 +23,10 @@ class SudokuGenerator:
 	None
     '''
     def __init__(self, row_length, removed_cells):
-        pass
-
+        self.row_length = row_length
+        self.removed_cells = removed_cells
+        self.board = [[0 for i in range(0, 9)] for j in range(0, 9)]
+        self.box_length = int(math.sqrt(row_length))
     '''
 	Returns a 2D python list of numbers which represents the board
 
@@ -32,7 +34,7 @@ class SudokuGenerator:
 	Return: list[list]
     '''
     def get_board(self):
-        pass
+        return self.board
 
     '''
 	Displays the board to the console
@@ -42,7 +44,16 @@ class SudokuGenerator:
 	Return: None
     '''
     def print_board(self):
-        pass
+        print("board:")
+        n = copy.deepcopy(self.board)
+        cnt = 0
+        for i in n:
+            i.insert(3, "|")
+            i.insert(7, "|")
+            print(i)
+            cnt += 1
+            if cnt % 3 == 0:
+                print("-------------------------------------")
 
     '''
 	Determines if num is contained in the specified row (horizontal) of the board
@@ -55,7 +66,10 @@ class SudokuGenerator:
 	Return: boolean
     '''
     def valid_in_row(self, row, num):
-        pass
+        for i in range(0, 9):
+            if self.board[row][i] == num:
+                return False
+        return True
 
     '''
 	Determines if num is contained in the specified column (vertical) of the board
@@ -68,7 +82,11 @@ class SudokuGenerator:
 	Return: boolean
     '''
     def valid_in_col(self, col, num):
-        pass
+        for i in range(0, 9):
+            if self.board[i][col] == num:
+                return False
+        return True
+
 
     '''
 	Determines if num is contained in the 3x3 box specified on the board
@@ -83,7 +101,11 @@ class SudokuGenerator:
 	Return: boolean
     '''
     def valid_in_box(self, row_start, col_start, num):
-        pass
+        for i in range(row_start, row_start + 3):
+            for j in range(col_start, col_start + 3):
+                if self.board[i][j] == num:
+                    return False
+        return True
     
     '''
     Determines if it is valid to enter num at (row, col) in the board
@@ -96,20 +118,28 @@ class SudokuGenerator:
 	Return: boolean
     '''
     def is_valid(self, row, col, num):
-        pass
+        if self.valid_in_box(row//3*3, col//3*3, num) and self.valid_in_row(row, num) and self.valid_in_col(col, num) is True:
+            return True
+        else:
+            return False
 
     '''
     Fills the specified 3x3 box with values
     For each position, generates a random digit which has not yet been used in the box
-
+    
 	Parameters:
 	row_start and col_start are the starting indices of the box to check
 	i.e. the box is from (row_start, col_start) to (row_start+2, col_start+2)
-
 	Return: None
     '''
+
     def fill_box(self, row_start, col_start):
-        pass
+        arr = [1, 2, 3, 4, 5, 6, 7, 8, 9]
+        for j in range(col_start, col_start + 3):
+            for i in range(row_start, row_start + 3):
+                c = random.choice(arr)
+                arr.remove(c)
+                self.board[i][j] = c
     
     '''
     Fills the three boxes along the main diagonal of the board
@@ -119,7 +149,9 @@ class SudokuGenerator:
 	Return: None
     '''
     def fill_diagonal(self):
-        pass
+        self.fill_box(0, 0)
+        self.fill_box(3, 3)
+        self.fill_box(6, 6)
 
     '''
     DO NOT CHANGE
@@ -185,7 +217,18 @@ class SudokuGenerator:
 	Return: None
     '''
     def remove_cells(self):
-        pass
+        cnt = 0
+        while True:
+            col = random.randint(0, 8)
+            row = random.randint(0, 8)
+            if cnt < self.removed_cells:
+                if self.board[row][col] != 0:
+                    self.board[row][col] = 0
+                    cnt += 1
+                else:
+                    continue
+            else:
+                break
 
 '''
 DO NOT CHANGE
